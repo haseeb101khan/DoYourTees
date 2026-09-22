@@ -1,4 +1,6 @@
 import Link from "next/link";
+import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
 import { CampaignBanner } from "@/components/storefront/campaign-banner";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { getCategories, getProducts } from "@/lib/data/storefront";
@@ -51,16 +53,41 @@ export default async function HomePage() {
           <p className="text-xs font-black uppercase tracking-[0.22em] text-blood">Browse</p>
           <h2 className="mt-2 text-4xl font-black uppercase tracking-tight">Shop by Category</h2>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {categories.map((category, index) => (
             <Link
               key={category.id}
               href={`/shop?category=${category.slug}`}
-              className="group min-h-56 border border-ink bg-white p-6 transition hover:bg-ink hover:text-white"
+              className="group relative isolate aspect-[4/5] overflow-hidden border border-ink bg-ink text-white"
             >
-              <span className="font-mono text-sm text-blood">0{index + 1}</span>
-              <h3 className="mt-14 text-3xl font-black uppercase">{category.name}</h3>
-              <p className="mt-3 text-sm leading-6 opacity-65">{category.description}</p>
+              {category.image_url ? (
+                <Image
+                  src={category.image_url}
+                  alt={`${category.name} collection`}
+                  fill
+                  sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
+                  className="-z-20 object-cover object-center transition-transform duration-500 ease-out group-hover:scale-[1.025]"
+                />
+              ) : (
+                <div className="absolute inset-0 -z-20 bg-ink" />
+              )}
+              <div className="absolute inset-0 -z-10 bg-gradient-to-t from-black via-black/35 to-transparent" />
+              <div className="flex h-full flex-col justify-between p-5 sm:p-6">
+                <div className="flex items-start justify-between gap-4">
+                  <span className="grid h-10 min-w-10 place-items-center bg-blood px-2 font-mono text-sm font-bold text-white">
+                    0{index + 1}
+                  </span>
+                  <span className="grid h-10 w-10 place-items-center border border-white/60 bg-black/55 transition-colors group-hover:border-blood group-hover:bg-blood">
+                    <ArrowUpRight size={19} aria-hidden="true" />
+                  </span>
+                </div>
+                <div>
+                  <p className="mb-3 text-xs font-black uppercase tracking-[0.18em] text-white/65">Explore Collection</p>
+                  <h3 className="text-3xl font-black uppercase leading-none sm:text-4xl xl:text-3xl">{category.name}</h3>
+                  <p className="mt-3 max-w-sm text-sm font-medium leading-6 text-white/80">{category.description}</p>
+                  <span className="mt-5 block h-1 w-12 bg-blood transition-[width] duration-300 group-hover:w-24" />
+                </div>
+              </div>
             </Link>
           ))}
         </div>
