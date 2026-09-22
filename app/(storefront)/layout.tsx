@@ -7,7 +7,7 @@ export default async function StorefrontLayout({ children }: { children: React.R
 
   return (
     <div className="min-h-screen bg-bone text-ink">
-      <Header categories={categories} />
+      <Header categories={categories} settings={settings} />
       <main>{children}</main>
       <Footer categories={categories} settings={settings} />
     </div>

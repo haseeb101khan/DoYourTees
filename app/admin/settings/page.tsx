@@ -19,6 +19,8 @@ export default async function AdminSettingsPage() {
         <Field name="bank_account_title" label="Bank Account Title" defaultValue={settings?.bank_account_title} />
         <Field name="bank_account_number" label="Account Number" defaultValue={settings?.bank_account_number} />
         <Field name="bank_iban" label="IBAN" defaultValue={settings?.bank_iban} />
+        <Field name="delivery_information" label="Delivery Information" defaultValue={settings?.delivery_information} textarea />
+        <Field name="exchange_information" label="Exchange / Return Information" defaultValue={settings?.exchange_information} textarea />
         <button className="bg-ink px-5 py-4 text-sm font-black uppercase tracking-[0.14em] text-white sm:col-span-2">Save Settings</button>
       </form>
     </div>
@@ -29,17 +31,23 @@ function Field({
   name,
   label,
   type = "text",
-  defaultValue
+  defaultValue,
+  textarea = false
 }: {
   name: string;
   label: string;
   type?: string;
   defaultValue?: string | number | null;
+  textarea?: boolean;
 }) {
   return (
     <label className="block text-sm font-black uppercase tracking-[0.14em]">
       {label}
-      <input name={name} type={type} defaultValue={defaultValue ?? ""} className="mt-2 w-full border border-ink/20 px-4 py-3 outline-none focus:border-blood" />
+      {textarea ? (
+        <textarea name={name} rows={4} defaultValue={defaultValue ?? ""} className="mt-2 w-full border border-ink/20 px-4 py-3 outline-none focus:border-blood" />
+      ) : (
+        <input name={name} type={type} defaultValue={defaultValue ?? ""} className="mt-2 w-full border border-ink/20 px-4 py-3 outline-none focus:border-blood" />
+      )}
     </label>
   );
 }

@@ -41,7 +41,7 @@ export function CartPage() {
                 <div className="mt-4 inline-flex border border-ink">
                   <button className="h-10 w-10" onClick={() => cart.setQuantity(item.variantId, item.quantity - 1)}>-</button>
                   <span className="grid h-10 w-10 place-items-center border-x border-ink font-black">{item.quantity}</span>
-                  <button className="h-10 w-10" onClick={() => cart.setQuantity(item.variantId, item.quantity + 1)}>+</button>
+                  <button disabled={item.quantity >= item.maxStock} className="h-10 w-10 disabled:opacity-30" onClick={() => cart.setQuantity(item.variantId, item.quantity + 1)}>+</button>
                 </div>
               </div>
               <button

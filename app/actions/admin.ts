@@ -71,6 +71,8 @@ export async function saveProduct(formData: FormData) {
     name,
     slug: String(formData.get("slug") || slugify(name)),
     description: String(formData.get("description") ?? ""),
+    material: String(formData.get("material") ?? "") || null,
+    fit: String(formData.get("fit") ?? "") || null,
     category_id: String(formData.get("category_id") ?? "") || null,
     regular_price: Math.round(Number(formData.get("regular_price") ?? 0)),
     sale_price: formData.get("sale_price") ? Math.round(Number(formData.get("sale_price"))) : null,
@@ -188,7 +190,9 @@ export async function updateSettings(formData: FormData) {
       bank_name: String(formData.get("bank_name") ?? "") || null,
       bank_account_title: String(formData.get("bank_account_title") ?? "") || null,
       bank_account_number: String(formData.get("bank_account_number") ?? "") || null,
-      bank_iban: String(formData.get("bank_iban") ?? "") || null
+      bank_iban: String(formData.get("bank_iban") ?? "") || null,
+      delivery_information: String(formData.get("delivery_information") ?? "") || null,
+      exchange_information: String(formData.get("exchange_information") ?? "") || null
     })
     .eq("id", 1);
   revalidatePath("/admin/settings");

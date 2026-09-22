@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { AddToCart } from "@/components/storefront/add-to-cart";
 import { ProductGrid } from "@/components/storefront/product-grid";
-import { getProductBySlug, getRelatedProducts } from "@/lib/data/storefront";
+import { getProductBySlug, getRelatedProducts, getStoreSettings } from "@/lib/data/storefront";
 import { activePrice, formatMoney } from "@/lib/utils";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
@@ -28,7 +28,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = await getRelatedProducts(product);
+  const [related, settings] = await Promise.all([getRelatedProducts(product), getStoreSettings()]);
   const images = product.product_images?.sort((a, b) => a.sort_order - b.sort_order) ?? [];
 
   return (
@@ -76,9 +76,19 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
           <div className="mt-8">
             <AddToCart product={product} />
           </div>
-          <div className="mt-8 grid gap-3 border-t border-ink/15 pt-6 text-sm text-ink/65">
-            <p><strong className="text-ink">Shipping:</strong> Standard delivery across Pakistan. Final charge appears at checkout.</p>
-            <p><strong className="text-ink">Returns:</strong> Exchange requests are accepted for unworn items with original packaging.</p>
+          <div className="mt-8 grid grid-cols-2 gap-px border border-ink/15 bg-ink/15 text-sm">
+            <ProductFact label="Material" value={product.material ?? "See product description"} />
+            <ProductFact label="Fit" value={product.fit ?? "Regular fit"} />
+          </div>
+          <div className="mt-5 divide-y divide-ink/10 border-y border-ink/15 text-sm">
+            <details className="group py-4" open>
+              <summary className="cursor-pointer list-none font-black uppercase tracking-[0.1em]">Delivery <span className="float-right group-open:rotate-45">+</span></summary>
+              <p className="mt-3 leading-6 text-ink/60">{settings.delivery_information ?? "Estimated delivery in 3-5 working days across Pakistan."} Shipping is calculated at checkout.</p>
+            </details>
+            <details className="group py-4">
+              <summary className="cursor-pointer list-none font-black uppercase tracking-[0.1em]">Exchange & Returns <span className="float-right group-open:rotate-45">+</span></summary>
+              <p className="mt-3 leading-6 text-ink/60">{settings.exchange_information ?? "Exchange requests are accepted for unworn items with original packaging."}</p>
+            </details>
           </div>
         </section>
       </div>
@@ -91,4 +101,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       )}
     </div>
   );
+}
+
+function ProductFact({ label, value }: { label: string; value: string }) {
+  return <div className="bg-white p-4"><p className="text-xs font-black uppercase tracking-[0.15em] text-ink/45">{label}</p><p className="mt-2 font-bold leading-6">{value}</p></div>;
 }

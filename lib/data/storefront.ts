@@ -1,7 +1,7 @@
 import { unstable_noStore as noStore } from "next/cache";
 import { demoCategories, demoProducts, demoSettings } from "@/lib/demo-data";
-import { hasSupabaseEnv } from "@/lib/supabase/env";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { hasServiceRoleEnv, hasSupabaseEnv } from "@/lib/supabase/env";
+import { createSupabaseAdminClient, createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Category, Product, StoreSettings } from "@/lib/types";
 
 const productSelect = `
@@ -45,6 +45,7 @@ export async function getProducts(options?: {
   category?: string;
   color?: string;
   size?: string;
+  q?: string;
   sort?: string;
   featured?: boolean;
   bestSeller?: boolean;
@@ -52,6 +53,7 @@ export async function getProducts(options?: {
   limit?: number;
 }): Promise<Product[]> {
   noStore();
+  const searchTerm = options?.q?.trim().replace(/[,()%]/g, " ").slice(0, 80);
 
   if (!hasSupabaseEnv()) {
     let products = visibleProducts(demoProducts);
@@ -63,6 +65,10 @@ export async function getProducts(options?: {
     }
     if (options?.size) {
       products = products.filter((product) => product.product_variants?.some((variant) => variant.size === options.size));
+    }
+    if (searchTerm) {
+      const term = searchTerm.toLowerCase();
+      products = products.filter((product) => `${product.name} ${product.description}`.toLowerCase().includes(term));
     }
     if (options?.featured) products = products.filter((product) => product.is_featured);
     if (options?.bestSeller) products = products.filter((product) => product.is_best_seller);
@@ -87,6 +93,7 @@ export async function getProducts(options?: {
     const category = categories.find((item) => item.slug === options.category);
     if (category) query = query.eq("category_id", category.id);
   }
+  if (searchTerm) query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
 
   if (options?.sort === "price-asc") query = query.order("sale_price", { ascending: true, nullsFirst: false });
   else if (options?.sort === "price-desc") query = query.order("sale_price", { ascending: false, nullsFirst: false });
@@ -104,6 +111,12 @@ export async function getProducts(options?: {
   }
   if (options?.size) {
     products = products.filter((product) => product.product_variants?.some((variant) => variant.size === options.size));
+  }
+  if (options?.sort === "price-asc") {
+    products.sort((a, b) => (a.sale_price ?? a.regular_price) - (b.sale_price ?? b.regular_price));
+  }
+  if (options?.sort === "price-desc") {
+    products.sort((a, b) => (b.sale_price ?? b.regular_price) - (a.sale_price ?? a.regular_price));
   }
 
   return products;
@@ -131,4 +144,16 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
 export async function getRelatedProducts(product: Product) {
   const products = await getProducts({ category: product.category?.slug, limit: 4 });
   return products.filter((item) => item.id !== product.id).slice(0, 3);
+}
+
+export async function getOrderConfirmation(token: string) {
+  noStore();
+  if (!hasServiceRoleEnv() || !/^[0-9a-f-]{36}$/i.test(token)) return null;
+  const supabase = createSupabaseAdminClient();
+  const { data } = await supabase
+    .from("orders")
+    .select("order_number, customer_phone, total, payment_method, payment_status, order_status, created_at")
+    .eq("confirmation_token", token)
+    .maybeSingle();
+  return data;
 }

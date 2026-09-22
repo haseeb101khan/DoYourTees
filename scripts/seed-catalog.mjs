@@ -43,6 +43,8 @@ const productRows = demoProducts.map((product) => ({
   name: product.name,
   slug: product.slug,
   description: product.description,
+  material: product.material,
+  fit: product.fit,
   regular_price: product.regular_price,
   sale_price: product.sale_price,
   is_featured: product.is_featured,

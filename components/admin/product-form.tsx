@@ -16,6 +16,10 @@ export function ProductForm({ product, categories }: { product?: Product | null;
         <Field name="slug" label="Slug" defaultValue={product?.slug} />
         <Field name="description" label="Description" defaultValue={product?.description} textarea required />
         <div className="grid gap-4 sm:grid-cols-2">
+          <Field name="material" label="Fabric / Material" defaultValue={product?.material} />
+          <Field name="fit" label="Fit" defaultValue={product?.fit} />
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
           <Field name="regular_price" label="Regular Price" type="number" defaultValue={product?.regular_price} required />
           <Field name="sale_price" label="Sale Price" type="number" defaultValue={product?.sale_price ?? ""} />
         </div>

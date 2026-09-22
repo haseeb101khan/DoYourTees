@@ -34,6 +34,8 @@ export type Product = {
   name: string;
   slug: string;
   description: string;
+  material: string | null;
+  fit: string | null;
   regular_price: number;
   sale_price: number | null;
   is_featured: boolean;
@@ -58,6 +60,8 @@ export type StoreSettings = {
   bank_account_title: string | null;
   bank_account_number: string | null;
   bank_iban: string | null;
+  delivery_information: string | null;
+  exchange_information: string | null;
 };
 
 export type CartLine = {
@@ -70,6 +74,7 @@ export type CartLine = {
   size: string;
   unitPrice: number;
   quantity: number;
+  maxStock: number;
 };
 
 export type OrderSummary = {
@@ -79,7 +84,7 @@ export type OrderSummary = {
   customer_phone: string;
   total: number;
   payment_method: "cod" | "bank_transfer";
-  payment_status: "pending" | "paid" | "failed" | "rejected";
+  payment_status: "pending" | "pending_verification" | "paid" | "failed" | "rejected";
   order_status: "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
   created_at: string;
 };

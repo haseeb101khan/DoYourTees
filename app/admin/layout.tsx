@@ -13,8 +13,7 @@ const nav = [
   ["Products", "/admin/products"],
   ["Categories", "/admin/categories"],
   ["Orders", "/admin/orders"],
-  ["Inventory", "/admin/inventory"],
-  ["Store Settings", "/admin/settings"]
+  ["Settings", "/admin/settings"]
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

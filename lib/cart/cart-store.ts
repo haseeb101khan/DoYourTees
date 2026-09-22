@@ -14,7 +14,11 @@ function persist(items: CartLine[]) {
 function readCart() {
   if (typeof window === "undefined") return [];
   try {
-    return JSON.parse(localStorage.getItem(key) ?? "[]") as CartLine[];
+    const parsed = JSON.parse(localStorage.getItem(key) ?? "[]") as CartLine[];
+    return parsed.map((item) => {
+      const maxStock = Math.max(0, Number(item.maxStock ?? 20));
+      return { ...item, maxStock, quantity: Math.max(1, Math.min(item.quantity, maxStock || 1)) };
+    });
   } catch {
     return [];
   }
@@ -46,7 +50,7 @@ export function useCart() {
         const next = existing
           ? current.map((item) =>
               item.variantId === line.variantId
-                ? { ...item, quantity: Math.min(item.quantity + line.quantity, 20) }
+                ? { ...item, maxStock: line.maxStock, quantity: Math.min(item.quantity + line.quantity, line.maxStock) }
                 : item
             )
           : [...current, line];
@@ -59,9 +63,9 @@ export function useCart() {
         setItems(next);
       },
       setQuantity(variantId: string, quantity: number) {
-        const next = readCart().map((item) =>
-          item.variantId === variantId ? { ...item, quantity: Math.max(1, Math.min(quantity, 20)) } : item
-        );
+        const next = readCart().map((item) => item.variantId === variantId
+          ? { ...item, quantity: Math.max(1, Math.min(quantity, item.maxStock)) }
+          : item);
         persist(next);
         setItems(next);
       },

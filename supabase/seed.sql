@@ -152,4 +152,22 @@ values (
 )
 on conflict (id) do update set store_name = excluded.store_name;
 
+update public.products
+set
+  material = coalesce(material, 'Premium combed cotton jersey'),
+  fit = coalesce(
+    fit,
+    case
+      when category_id = (select id from public.categories where slug = 'drop-shoulders' limit 1)
+        then 'Relaxed drop-shoulder fit'
+      else 'Comfortable regular fit'
+    end
+  );
+
+update public.store_settings
+set
+  delivery_information = coalesce(delivery_information, 'Estimated delivery in 3-5 working days across Pakistan.'),
+  exchange_information = coalesce(exchange_information, 'Exchange requests are accepted within 7 days for unworn items with original tags and packaging.')
+where id = 1;
+
 commit;

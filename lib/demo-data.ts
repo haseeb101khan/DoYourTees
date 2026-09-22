@@ -33,6 +33,8 @@ function catalogProduct(entry: CatalogEntry, index: number): Product {
     name: entry.name,
     slug: entry.slug,
     description: entry.description,
+    material: "Premium combed cotton jersey",
+    fit: entry.categoryId === "cat-oversized" ? "Relaxed drop-shoulder fit" : "Comfortable regular fit",
     regular_price: entry.price,
     sale_price: entry.salePrice ?? null,
     is_featured: entry.featured ?? false,
@@ -94,5 +96,7 @@ export const demoSettings: StoreSettings = {
   bank_name: "Configure in Admin",
   bank_account_title: "DYT",
   bank_account_number: "Configure in Admin",
-  bank_iban: "Configure in Admin"
+  bank_iban: "Configure in Admin",
+  delivery_information: "Estimated delivery in 3-5 working days across Pakistan.",
+  exchange_information: "Exchange requests are accepted within 7 days for unworn items with original tags and packaging."
 };

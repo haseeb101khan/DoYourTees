@@ -5,7 +5,7 @@ import { checkoutSchema, type CheckoutInput } from "@/lib/validators/checkout";
 import { hasServiceRoleEnv } from "@/lib/supabase/env";
 import { createSupabaseAdminClient } from "@/lib/supabase/server";
 
-type Result = { ok: true; orderNumber: string } | { ok: false; error: string };
+type Result = { ok: true; orderNumber: string; confirmationToken: string } | { ok: false; error: string };
 
 export async function createOrder(input: CheckoutInput): Promise<Result> {
   const parsed = checkoutSchema.safeParse(input);
@@ -13,7 +13,7 @@ export async function createOrder(input: CheckoutInput): Promise<Result> {
   if (!hasServiceRoleEnv()) return { ok: false, error: "Supabase service role is not configured yet." };
 
   const supabase = createSupabaseAdminClient();
-  const { data: orderNumber, error } = await supabase.rpc("place_order", {
+  const { data, error } = await supabase.rpc("place_order", {
     p_customer_name: parsed.data.fullName,
     p_customer_phone: parsed.data.phone,
     p_customer_email: parsed.data.email || "",
@@ -25,10 +25,11 @@ export async function createOrder(input: CheckoutInput): Promise<Result> {
     p_items: parsed.data.items
   });
 
-  if (error || !orderNumber) {
+  const result = data as { orderNumber?: string; confirmationToken?: string } | null;
+  if (error || !result?.orderNumber || !result.confirmationToken) {
     return { ok: false, error: error?.message ?? "Unable to create order." };
   }
 
   revalidatePath("/admin/orders");
-  return { ok: true, orderNumber };
+  return { ok: true, orderNumber: result.orderNumber, confirmationToken: result.confirmationToken };
 }

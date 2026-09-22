@@ -3,20 +3,28 @@
 import Link from "next/link";
 import { Menu, ShoppingBag, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import type { Category } from "@/lib/types";
+import type { Category, StoreSettings } from "@/lib/types";
 import { useCart } from "@/lib/cart/cart-store";
+import { CartDrawer } from "@/components/storefront/cart-drawer";
 
-export function Header({ categories }: { categories: Category[] }) {
+export function Header({ categories, settings }: { categories: Category[]; settings: StoreSettings }) {
   const [open, setOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const cart = useCart();
   const count = cart.items.reduce((sum, item) => sum + item.quantity, 0);
 
   useEffect(() => {
-    document.body.style.overflow = open ? "hidden" : "";
+    document.body.style.overflow = open || cartOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
-  }, [open]);
+  }, [open, cartOpen]);
+
+  useEffect(() => {
+    const showCart = () => setCartOpen(true);
+    window.addEventListener("dyt-cart-open", showCart);
+    return () => window.removeEventListener("dyt-cart-open", showCart);
+  }, []);
 
   const nav = (
     <>
@@ -36,6 +44,7 @@ export function Header({ categories }: { categories: Category[] }) {
   );
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-ink/10 bg-bone/95 backdrop-blur">
       <div className="container-pad flex h-20 items-center justify-between">
         <Link href="/" className="group flex items-end gap-3" aria-label="DYT home">
@@ -46,8 +55,9 @@ export function Header({ categories }: { categories: Category[] }) {
         </Link>
         <nav className="hidden items-center gap-8 lg:flex">{nav}</nav>
         <div className="flex items-center gap-2">
-          <Link
-            href="/cart"
+          <button
+            type="button"
+            onClick={() => setCartOpen(true)}
             className="focus-ring relative inline-flex h-11 w-11 items-center justify-center border border-ink bg-ink text-white transition hover:bg-blood"
             aria-label="Cart"
           >
@@ -57,7 +67,7 @@ export function Header({ categories }: { categories: Category[] }) {
                 {count}
               </span>
             )}
-          </Link>
+          </button>
           <button
             className="focus-ring inline-flex h-11 w-11 items-center justify-center border border-ink lg:hidden"
             onClick={() => setOpen(true)}
@@ -88,5 +98,7 @@ export function Header({ categories }: { categories: Category[] }) {
         </div>
       )}
     </header>
+    <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} settings={settings} />
+    </>
   );
 }
