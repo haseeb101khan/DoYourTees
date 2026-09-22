@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CampaignBanner } from "@/components/storefront/campaign-banner";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { getCategories, getProducts } from "@/lib/data/storefront";
 
@@ -18,63 +19,69 @@ export default async function ShopPage({
   const colors = ["Black", "White", "Red"];
 
   return (
-    <div className="container-pad py-12">
-      <div className="mb-10 border-b border-ink pb-8">
-        <p className="text-xs font-black uppercase tracking-[0.24em] text-blood">Storefront</p>
-        <h1 className="mt-2 text-6xl font-black uppercase tracking-tight">Shop</h1>
-      </div>
+    <>
+      <CampaignBanner
+        desktop="/banners/catalogue-desktop.png"
+        mobile="/banners/catalogue-mobile.png"
+        alt="DYT catalogue featuring T-shirts, oversized fits, sleeveless tees, and long sleeves"
+        priority
+      />
 
-      <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
-        <aside className="space-y-8">
-          <FilterBlock title="Categories">
-            <FilterLink href="/shop" active={!params.category}>
-              All Products
-            </FilterLink>
-            {categories.map((category) => (
-              <FilterLink key={category.id} href={`/shop?category=${category.slug}`} active={params.category === category.slug}>
-                {category.name}
-              </FilterLink>
-            ))}
-          </FilterBlock>
-          <FilterBlock title="Size">
-            {sizes.map((size) => (
-              <FilterLink key={size} href={`/shop?${new URLSearchParams({ ...params, size }).toString()}`} active={params.size === size}>
-                {size}
-              </FilterLink>
-            ))}
-          </FilterBlock>
-          <FilterBlock title="Color">
-            {colors.map((color) => (
-              <FilterLink
-                key={color}
-                href={`/shop?${new URLSearchParams({ ...params, color }).toString()}`}
-                active={params.color === color}
-              >
-                {color}
-              </FilterLink>
-            ))}
-          </FilterBlock>
-        </aside>
+      <div className="container-pad py-12">
+        <h1 className="sr-only">Shop all DYT streetwear</h1>
 
-        <section>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <p className="text-sm font-bold text-ink/60">Showing {products.length} product{products.length === 1 ? "" : "s"}</p>
-            <div className="flex flex-wrap gap-2">
-              <FilterLink href={`/shop?${new URLSearchParams({ ...params, sort: "newest" }).toString()}`} active={params.sort === "newest"}>
-                Newest
+        <div className="grid gap-10 lg:grid-cols-[260px_1fr]">
+          <aside className="space-y-8">
+            <FilterBlock title="Categories">
+              <FilterLink href="/shop" active={!params.category}>
+                All Products
               </FilterLink>
-              <FilterLink href={`/shop?${new URLSearchParams({ ...params, sort: "price-asc" }).toString()}`} active={params.sort === "price-asc"}>
-                Price Low
-              </FilterLink>
-              <FilterLink href={`/shop?${new URLSearchParams({ ...params, sort: "price-desc" }).toString()}`} active={params.sort === "price-desc"}>
-                Price High
-              </FilterLink>
+              {categories.map((category) => (
+                <FilterLink key={category.id} href={`/shop?category=${category.slug}`} active={params.category === category.slug}>
+                  {category.name}
+                </FilterLink>
+              ))}
+            </FilterBlock>
+            <FilterBlock title="Size">
+              {sizes.map((size) => (
+                <FilterLink key={size} href={`/shop?${new URLSearchParams({ ...params, size }).toString()}`} active={params.size === size}>
+                  {size}
+                </FilterLink>
+              ))}
+            </FilterBlock>
+            <FilterBlock title="Color">
+              {colors.map((color) => (
+                <FilterLink
+                  key={color}
+                  href={`/shop?${new URLSearchParams({ ...params, color }).toString()}`}
+                  active={params.color === color}
+                >
+                  {color}
+                </FilterLink>
+              ))}
+            </FilterBlock>
+          </aside>
+
+          <section>
+            <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+              <p className="text-sm font-bold text-ink/60">Showing {products.length} product{products.length === 1 ? "" : "s"}</p>
+              <div className="flex flex-wrap gap-2">
+                <FilterLink href={`/shop?${new URLSearchParams({ ...params, sort: "newest" }).toString()}`} active={params.sort === "newest"}>
+                  Newest
+                </FilterLink>
+                <FilterLink href={`/shop?${new URLSearchParams({ ...params, sort: "price-asc" }).toString()}`} active={params.sort === "price-asc"}>
+                  Price Low
+                </FilterLink>
+                <FilterLink href={`/shop?${new URLSearchParams({ ...params, sort: "price-desc" }).toString()}`} active={params.sort === "price-desc"}>
+                  Price High
+                </FilterLink>
+              </div>
             </div>
-          </div>
-          <ProductGrid products={products} />
-        </section>
+            <ProductGrid products={products} />
+          </section>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

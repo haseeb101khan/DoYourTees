@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { BannerCarousel } from "@/components/storefront/banner-carousel";
+import { CampaignBanner } from "@/components/storefront/campaign-banner";
 import { ProductGrid } from "@/components/storefront/product-grid";
 import { getCategories, getProducts } from "@/lib/data/storefront";
 
@@ -13,7 +13,13 @@ export default async function HomePage() {
   return (
     <>
       <h1 className="sr-only">DYT - Do Your Tee Pakistani Streetwear</h1>
-      <BannerCarousel />
+      <CampaignBanner
+        desktop="/banners/homepage-desktop.png"
+        mobile="/banners/homepage-mobile.png"
+        alt="DYT Wear What You're Into streetwear campaign"
+        href="/shop?sort=newest"
+        priority
+      />
 
       <section className="container-pad py-16">
         <div className="mb-8 flex items-end justify-between gap-5">
